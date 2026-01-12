@@ -1,0 +1,33 @@
+# Build outputs
+build/
+bin/
+obj/
+
+# C/C++ compilation artifacts
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.app
+*.d
+
+# Debug / profiling
+*.dSYM/
+*.profraw
+*.profdata
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Tooling
+compile_commands.json
