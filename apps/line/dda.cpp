@@ -8,7 +8,7 @@ constexpr TGAColor blue    = {255, 128,  64, 255};
 constexpr TGAColor yellow  = {  0, 200, 255, 255};
 
 /**
- * @brief DAA法
+ * @brief DDA法
  * 
  * @param ax 
  * @param ay 

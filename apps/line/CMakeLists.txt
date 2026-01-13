@@ -2,7 +2,7 @@ set(LINE_TRY_SOURCES
   parametric_v1.cpp
   parametric_v2.cpp
   parametric_v3.cpp
-  daa.cpp
+  dda.cpp
   bresenham.cpp
 )
 
