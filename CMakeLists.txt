@@ -22,23 +22,7 @@ endif()
 
 find_package(OpenMP COMPONENTS CXX)
 
-add_library(tiny_renderer
-  src/tgaimage.cpp
-)
-
-target_include_directories(tiny_renderer
-  PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-add_executable(begin
-  apps/begin/main.cpp
-)
-
-target_link_libraries(begin
-  PRIVATE
-    tiny_renderer
-    $<$<BOOL:${OpenMP_CXX_FOUND}>:OpenMP::OpenMP_CXX>
-)
+add_subdirectory(src)
+add_subdirectory(apps)
 
 file(GENERATE OUTPUT .gitignore CONTENT "*")
