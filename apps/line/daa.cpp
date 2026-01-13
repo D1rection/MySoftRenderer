@@ -8,7 +8,7 @@ constexpr TGAColor blue    = {255, 128,  64, 255};
 constexpr TGAColor yellow  = {  0, 200, 255, 255};
 
 /**
- * @brief 朴素参数插值法画线
+ * @brief DAA法
  * 
  * @param ax 
  * @param ay 
@@ -18,10 +18,19 @@ constexpr TGAColor yellow  = {  0, 200, 255, 255};
  * @param color 
  */
 void line(int ax, int ay, int bx, int by, TGAImage &framebuffer, TGAColor color) {
-    for (float t=0.; t<1.; t+=.02) {
-        int x = std::round( ax + (bx-ax)*t );
-        int y = std::round( ay + (by-ay)*t );
-        framebuffer.set(x, y, color);
+    bool isSteep = std::abs(ax - bx) < std::abs(ay - by);
+    if(isSteep) {
+        std::swap(ax, ay);
+        std::swap(bx, by);
+    }
+    if(ax > bx) {   // ltr
+        std::swap(ax, bx);
+        std::swap(ay, by);
+    }
+    float y = ay;
+    for(int x = ax; x <= bx; x ++) {
+        isSteep ? framebuffer.set(y, x, color) : framebuffer.set(x, y, color);
+        y += (by - ay) / static_cast<float>(bx - ax);   // 每次x进，y就增斜率量
     }
 }
 
@@ -43,6 +52,6 @@ int main(int argc, char** argv) {
     framebuffer.set(bx, by, white);
     framebuffer.set(cx, cy, white);
 
-    framebuffer.write_tga_file("line_try_01.tga");
+    framebuffer.write_tga_file("daa.tga");
     return 0;
 }

@@ -1,5 +1,9 @@
 set(LINE_TRY_SOURCES
-  try_01.cpp
+  parametric_v1.cpp
+  parametric_v2.cpp
+  parametric_v3.cpp
+  daa.cpp
+  bresenham.cpp
 )
 
 foreach(src IN LISTS LINE_TRY_SOURCES)
