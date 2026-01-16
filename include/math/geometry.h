@@ -44,7 +44,7 @@ template<int n> double operator*(const vec<n>& lhs, const vec<n>& rhs) {
  */
 template<int n> vec<n> operator+(const vec<n>& lhs, const vec<n>& rhs) {
     vec<n> ret = lhs;
-    for(int i = 0; i < n; i ++) ret += rhs[i];
+    for(int i = 0; i < n; i ++) ret[i] += rhs[i];
     return ret;
 }
 
@@ -58,7 +58,7 @@ template<int n> vec<n> operator+(const vec<n>& lhs, const vec<n>& rhs) {
  */
 template<int n> vec<n> operator-(const vec<n>& lhs, const vec<n>& rhs) {
     vec<n> ret = lhs;
-    for(int i = 0; i < n; i ++) ret -= rhs[i];
+    for(int i = 0; i < n; i ++) ret[i] -= rhs[i];
     return ret;
 }
 
@@ -165,7 +165,7 @@ template<int n> double norm(const vec<n>& v) {
  * @tparam n 
  * @return vec<n> 
  */
-template<int n> vec<n> normalized() {
+template<int n> vec<n> normalized(const vec<n>& v) {
     return v / norm(v);
 }
 
@@ -196,7 +196,7 @@ template<int n> struct dt;
  * 
  * @tparam nrows 
  * @tparam ncols
- * @note 行主序
+ * @note 行主序，[]访问每一行长度为ncols的向量
  */
 template<int nrows, int ncols> struct mat {
     vec<ncols> rows[nrows] = {{}};
@@ -227,12 +227,51 @@ template<int nrows, int ncols> struct mat {
      */
     double cofactor(const int row, const int col) const {
         mat<nrows - 1, ncols - 1> submatrix;
-        for(int i = 0; i < nrows; i ++) {
-            for(int j = 0; j < ncols; j ++) {
+        for(int i = 0; i < nrows - 1; i ++) {
+            for(int j = 0; j < ncols - 1; j ++) {
                 submatrix[i][j] = rows[i + int(i >= row)][j + int(j >= col)];
             }
         }
-        return submatrix.det() * ((row + col) % 2 ? 1 : -1);
+        return submatrix.det() * ((row + col) % 2 ? -1 : 1);
+    }
+
+    /**
+     * @brief 求矩阵的转置逆矩阵
+     * 
+     * @return mat<nrows, ncols> 
+     */
+    mat<nrows, ncols> invert_transpose() const {
+        mat<nrows, ncols> adjugate_transpose;
+        for(int i = 0; i < nrows; i ++) {
+            for(int j = 0; j < ncols; j ++) {
+                adjugate_transpose[i][j] = cofactor(i, j);
+            }
+        }
+        return adjugate_transpose / (adjugate_transpose[0] * rows[0]);
+    }
+
+    /**
+     * @brief 求矩阵的逆矩阵
+     * 
+     * @return mat<nrows,ncols> 
+     */
+    mat<nrows,ncols> invert() const {
+        return invert_transpose().transpose();
+    }
+
+    /**
+     * @brief 求矩阵的转置
+     * 
+     * @return mat<ncols, nrows> 
+     */
+    mat<ncols, nrows> transpose() const {
+        mat<ncols, nrows> ret;
+        for(int i = 0; i < ncols; i ++) {
+            for(int j = 0; j < nrows; j ++) {
+                ret[i][j] = rows[j][i];
+            }
+        }
+        return ret;
     }
 };
 
@@ -248,3 +287,152 @@ template<int nrows, int ncols> struct mat {
 template<int nrows, int ncols> vec<ncols> operator*(const vec<nrows>& lhs, const mat<nrows, ncols>& rhs) {
     return (mat<1, nrows>{{lhs}} * rhs)[0];
 }
+
+/**
+ * @brief 矩阵右乘列向量
+ * 
+ * @tparam nrows 
+ * @tparam ncols 
+ * @param lhs 
+ * @param rhs 
+ * @return vec<nrows> 
+ */
+template<int nrows, int ncols> vec<nrows> operator*(const mat<nrows, ncols>& lhs, const vec<ncols>& rhs) {
+    vec<nrows> ret;
+    for(int i = 0; i < nrows; i ++ ) ret[i] = lhs[i] * rhs;
+    return ret;
+}
+
+/**
+ * @brief 矩阵乘法
+ * 
+ * @tparam R1 
+ * @tparam C1 
+ * @tparam C2 
+ * @param lhs 
+ * @param rhs 
+ * @return mat<R1, C2> 
+ */
+template<int R1, int C1, int C2> mat<R1, C2> operator*(const mat<R1, C1>& lhs, const mat<C1, C2>& rhs) {
+    mat<R1, C2> ret;
+    for(int i = 0; i < R1; i ++) {
+        for(int j = 0; j < C2; j ++) {
+            for(int k = 0; k < C1; k ++) {
+                ret[i][j] += lhs[i][k] * rhs[k][j];
+            }
+        }
+    }
+    return ret;
+}
+
+/**
+ * @brief 矩阵右乘标量
+ * 
+ * @tparam nrows 
+ * @tparam ncols 
+ * @param lhs 
+ * @param val 
+ * @return mat<nrows, ncols> 
+ */
+template<int nrows, int ncols> mat<nrows, ncols> operator*(const mat<nrows, ncols>& lhs, const double& val) {
+    mat<nrows, ncols> ret;
+    for(int i = 0; i < nrows; i ++) ret[i] = lhs[i] * val;
+    return ret;
+}
+
+/**
+ * @brief 矩阵左乘标量
+ * 
+ * @tparam nrows 
+ * @tparam ncols 
+ * @param val
+ * @param rhs
+ * @return mat<nrows, ncols> 
+ */
+template<int nrows, int ncols> mat<nrows, ncols> operator*(const double& val, const mat<nrows, ncols>& rhs) {
+    return rhs * val;
+}
+
+/**
+ * @brief 矩阵右除标量
+ * 
+ * @tparam nrows 
+ * @tparam ncols 
+ * @param lhs 
+ * @param val 
+ * @return mat<nrows, ncols> 
+ */
+template<int nrows, int ncols> mat<nrows, ncols> operator/(const mat<nrows, ncols>& lhs, const double& val) {
+    mat<nrows, ncols> ret;
+    for(int i = 0; i < nrows; i ++) ret[i] = lhs[i] / val;
+    return ret;
+}
+
+/**
+ * @brief 矩阵加法
+ * 
+ * @tparam nrows 
+ * @tparam ncols 
+ * @param lhs 
+ * @param rhs 
+ * @return mat<nrows, ncols> 
+ */
+template<int nrows, int ncols> mat<nrows, ncols> operator+(const mat<nrows, ncols>& lhs, const mat<nrows, ncols>& rhs) {
+    mat<nrows, ncols> ret;
+    for(int i = 0; i < nrows; i ++) ret[i] = lhs[i] + rhs[i];
+    return ret;
+}
+
+/**
+ * @brief 矩阵减法
+ * 
+ * @tparam nrows 
+ * @tparam ncols 
+ * @param lhs 
+ * @param rhs 
+ * @return mat<nrows, ncols> 
+ */
+template<int nrows, int ncols> mat<nrows, ncols> operator-(const mat<nrows, ncols>& lhs, const mat<nrows, ncols>& rhs) {
+    mat<nrows, ncols> ret;
+    for(int i = 0; i < nrows; i ++) ret[i] = lhs[i] - rhs[i];
+    return ret;
+}
+
+/**
+ * @brief 重定义矩阵输出
+ * 
+ * @tparam nrows 
+ * @tparam ncols 
+ * @param out 
+ * @param m 
+ * @return std::ostream& 
+ */
+template<int nrows,int ncols> std::ostream& operator<<(std::ostream& out, const mat<nrows,ncols>& m) {
+    for (int i = 0; i < nrows; i ++) out << m[i] << std::endl;
+    return out;
+}
+
+/**
+ * @brief 拉普拉斯展开求矩阵行列式
+ * 
+ * @tparam n 
+ */
+template<int n> struct dt {
+    static double det(const mat<n, n>& src) {
+        double det = 0;
+        for(int i = 0; i < n; i ++) det += src[0][i] * src.cofactor(0, i);
+        return det;
+    }
+};
+
+/**
+ * @brief 拉普拉斯展开求矩阵行列式
+ * 
+ * @tparam  
+ * @note 终结情况
+ */
+template<> struct dt<1> {
+    static double det(const mat<1,1>& src) {
+        return src[0][0];
+    }
+};
