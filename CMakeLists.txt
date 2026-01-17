@@ -25,4 +25,9 @@ find_package(OpenMP COMPONENTS CXX)
 add_subdirectory(src)
 add_subdirectory(apps)
 
+include(CTest)
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
+
 file(GENERATE OUTPUT .gitignore CONTENT "*")
