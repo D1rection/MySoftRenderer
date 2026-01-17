@@ -4,6 +4,7 @@ set(LINE_TRY_SOURCES
   parametric_v3.cpp
   dda.cpp
   bresenham.cpp
+  main.cpp
 )
 
 foreach(src IN LISTS LINE_TRY_SOURCES)
