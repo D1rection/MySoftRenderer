@@ -1,6 +1,7 @@
 set(TRI_TRY_SOURCES
   scanline.cpp
   modern.cpp
+  main.cpp
 )
 
 foreach(src IN LISTS TRI_TRY_SOURCES)
