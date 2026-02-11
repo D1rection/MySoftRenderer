@@ -1,6 +1,8 @@
 set(TRI_TRY_SOURCES
   scanline.cpp
   modern.cpp
+  gray.cpp
+  rgb.cpp
   main.cpp
 )
 

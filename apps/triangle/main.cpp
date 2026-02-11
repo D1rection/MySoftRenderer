@@ -63,8 +63,6 @@ void triangle(int ax, int ay, int bx, int by, int cx, int cy, TGAImage &framebuf
             framebuffer.set(x, y, color);
         }
     }
-
-
 }
 
 /**

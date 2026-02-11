@@ -71,7 +71,7 @@ void line(int ax, int ay, int bx, int by, TGAImage &framebuffer, TGAColor color)
  * @param framebuffer 
  * @param color 
  */
-void triangle(int ax, int ay, int bx, int by, int cx, int cy, TGAImage &framebuffer, TGAColor color) {
+void triangle(int ax, int ay, int bx, int by, int cx, int cy, TGAImage &framebuffer) {
     /* 左下角坐标 */
     int bbminx = std::min(ax, std::min(bx, cx));
     int bbminy = std::min(ay, std::min(by, cy));
@@ -87,16 +87,17 @@ void triangle(int ax, int ay, int bx, int by, int cx, int cy, TGAImage &framebuf
             double gamma = get_signed_area(x, y, ax, ay, bx, by) / tot_area;
 
             if(alpha < 0 || beta < 0 || gamma < 0) continue;
-            framebuffer.set(x, y, color);
+            unsigned char z = static_cast<unsigned char>(alpha * 23 + beta * 59 + gamma * 255);
+            framebuffer.set(x, y, {z});
         }
     }
 }
 
 int main() {
-    TGAImage framebuffer(width, height, TGAImage::RGB);
-    triangle(  7, 45, 35, 100, 45,  60, framebuffer, red);
-    triangle(120, 35, 90,   5, 45, 110, framebuffer, white);
-    triangle(115, 83, 80,  90, 85, 120, framebuffer, green);
-    framebuffer.write_tga_file("modern.tga");
+    TGAImage framebuffer(width, height, TGAImage::GRAYSCALE);
+    triangle(  7, 45, 35, 100, 45,  60, framebuffer);
+    triangle(120, 35, 90,   5, 45, 110, framebuffer);
+    triangle(115, 83, 80,  90, 85, 120, framebuffer);
+    framebuffer.write_tga_file("gray.tga");
     return 0;
 }

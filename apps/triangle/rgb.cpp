@@ -1,4 +1,6 @@
 #include <cmath>
+
+#include "math/geometry.h"
 #include "tga/tgaimage.h"
 
 constexpr TGAColor white   = {255, 255, 255, 255}; // attention, BGRA order
@@ -71,7 +73,7 @@ void line(int ax, int ay, int bx, int by, TGAImage &framebuffer, TGAColor color)
  * @param framebuffer 
  * @param color 
  */
-void triangle(int ax, int ay, int bx, int by, int cx, int cy, TGAImage &framebuffer, TGAColor color) {
+void triangle(int ax, int ay, int bx, int by, int cx, int cy, TGAImage &framebuffer) {
     /* 左下角坐标 */
     int bbminx = std::min(ax, std::min(bx, cx));
     int bbminy = std::min(ay, std::min(by, cy));
@@ -87,16 +89,22 @@ void triangle(int ax, int ay, int bx, int by, int cx, int cy, TGAImage &framebuf
             double gamma = get_signed_area(x, y, ax, ay, bx, by) / tot_area;
 
             if(alpha < 0 || beta < 0 || gamma < 0) continue;
-            framebuffer.set(x, y, color);
+            
+            unsigned char b = static_cast<unsigned char>(alpha * 0 + beta * 0 + gamma * 255);
+            unsigned char g = static_cast<unsigned char>(alpha * 0 + beta * 255 + gamma * 0);
+            unsigned char r = static_cast<unsigned char>(alpha * 255 + beta * 128 + gamma * 64);
+            unsigned char a = static_cast<unsigned char>(255);
+
+            framebuffer.set(x, y, {b, g, r, a});
         }
     }
 }
 
 int main() {
     TGAImage framebuffer(width, height, TGAImage::RGB);
-    triangle(  7, 45, 35, 100, 45,  60, framebuffer, red);
-    triangle(120, 35, 90,   5, 45, 110, framebuffer, white);
-    triangle(115, 83, 80,  90, 85, 120, framebuffer, green);
-    framebuffer.write_tga_file("modern.tga");
+    triangle(  7, 45, 35, 100, 45,  60, framebuffer);
+    triangle(120, 35, 90,   5, 45, 110, framebuffer);
+    triangle(115, 83, 80,  90, 85, 120, framebuffer);
+    framebuffer.write_tga_file("rgb.tga");
     return 0;
 }
