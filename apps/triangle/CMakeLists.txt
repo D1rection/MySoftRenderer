@@ -1,4 +1,5 @@
 set(TRI_TRY_SOURCES
+  hidden_face.cpp
   scanline.cpp
   modern.cpp
   gray.cpp
