@@ -1,5 +1,6 @@
 set(CAMERA_TRY_SOURCES
   simple.cpp
+  better.cpp
 )
 
 foreach(src IN LISTS CAMERA_TRY_SOURCES)
